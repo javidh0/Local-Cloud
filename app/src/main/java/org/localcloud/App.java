@@ -3,6 +3,13 @@
  */
 package org.localcloud;
 
+import org.localcloud.Data.AppProperties;
+import org.localcloud.Data.DBProperties;
+import org.localcloud.db.DB;
+import org.localcloud.db.UserDB;
+
+import java.sql.SQLException;
+
 public class App {
     public String getGreeting() {
         return "Hello World!";
@@ -10,5 +17,16 @@ public class App {
 
     public static void main(String[] args) {
         System.out.println(new App().getGreeting());
+        AppProperties.loadProperties();
+        DB.loadDBInstance();
+        DBProperties.loadProperties();
+
+        UserDB userDB = new UserDB();
+        try {
+            var a = userDB.authenticateUser("admin1", "adminpass");
+            int b = 10;
+        } catch (SQLException e) {
+            //ignored
+        }
     }
 }

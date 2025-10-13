@@ -1,0 +1,1 @@
+users.auth.details --> SELECT role, password FROM users WHERE userid = {user_id};
