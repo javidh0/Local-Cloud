@@ -12,4 +12,7 @@ public class AppPropConstant {
     public final static String APP_PROPERTIES_USER_PASSWORD = "db.schema.user.password";
     public final static String APP_PROPERTIES_USER_ROLE = "db.schema.user.role";
     public final static String APP_PROPERTIES_USER_PK = "db.schema.user.pk";
+
+    //Server prop
+    public final static String APP_PROPERTIES_COOKIE_SESSION_EXPIRE = "server.cookie.session.expire";
 }

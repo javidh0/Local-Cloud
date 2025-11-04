@@ -4,10 +4,8 @@ import org.localcloud.Data.AppProperties;
 import org.localcloud.Data.AppPropConstant;
 import org.localcloud.DataStructure.Pair;
 import org.localcloud.IAM.UserRole;
-import org.localcloud.db.schema.TableColumn;
 
 import java.sql.*;
-import java.util.ArrayList;
 
 public class DB {
     private static Connection connection;
@@ -30,14 +28,14 @@ public class DB {
         return connection != null;
     }
 
-    protected Pair<String, UserRole> getPasswordAndRole(String cmd, TableColumn passCol, TableColumn roleCol) throws NullPointerException {
+    protected static Pair<String, UserRole> getPasswordAndRole(String cmd) throws NullPointerException {
         if(!isConnected()) throw  new NullPointerException("DB Instance Not created!");
 
         try (Statement statement = connection.createStatement(); ResultSet rs = statement.executeQuery(cmd)) {
             Pair<String, UserRole> pair = new Pair<>();
             rs.next();
-            pair.setFirst(rs.getString(passCol.getColumnName()));
-            pair.setSecond(rs.getString(roleCol.getColumnName()).equals("A")? UserRole.ADMIN : UserRole.USER);
+            pair.setFirst(rs.getString(org.localcloud.db.schema.UserTableColumn.PASSWORD.getColumnName()));
+            pair.setSecond(rs.getString(org.localcloud.db.schema.UserTableColumn.ROLE.getColumnName()).equals("A")? UserRole.ADMIN : UserRole.USER);
 
             return pair;
         } catch (SQLException e) {
