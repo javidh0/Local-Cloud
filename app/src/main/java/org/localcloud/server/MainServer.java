@@ -7,6 +7,7 @@ import org.localcloud.Data.AppProperties;
 import org.localcloud.IAM.IAMHolder;
 import org.localcloud.IAM.UserSessionsHandler;
 import org.localcloud.server.handlers.LoginHandler;
+import io.javalin.http.HaltException;
 
 import java.util.HashMap;
 
@@ -15,7 +16,29 @@ public class MainServer {
     public static void startServer() {
         cookieExpireTime = Integer.valueOf(AppProperties.get(AppPropConstant.APP_PROPERTIES_COOKIE_SESSION_EXPIRE));
         Javalin app = Javalin.create().start(7070);
-        app.get("/", MainServer::loginHandler);
+
+        app.before(MainServer::beforeMiddleWare);
+        app.get("/login", MainServer::loginHandler);
+        app.get("/", (c) -> c.result("hello"));
+    }
+
+    private static void beforeMiddleWare(Context context) {
+        if(context.path().equals("/login")) return;
+        if(!authenticateUser(context)) {
+            throw new HaltException(401, "Unauthorized");
+        }
+    }
+
+    private static boolean authenticateUser(Context context) {
+        try {
+            IAMHolder iamHolder = getCookieIAMHolder(context);
+            if(iamHolder == null) return false;
+            context.header("auth_token", iamHolder.getSessionId());
+            return true;
+        } catch (Exception e) {
+            // logger
+        }
+        return false;
     }
 
     private static void loginHandler(Context context) {
@@ -38,7 +61,7 @@ public class MainServer {
                 context.cookie(key, map.get(key).toString());
             }
 
-            context.result("Hello welcome to local cloud\n" );
+            context.result("\nLogin\n" );
         }
         catch (Exception e) {
             context.result(e.toString());
